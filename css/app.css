@@ -17,7 +17,8 @@ body {
 }
 
 body {
-    background: #ffffff url('../img/geometry2.png'); /* Background pattern from Subtle Patterns */
+    background: #ffffff url('../img/geometry2.png');
+    /* Background pattern from Subtle Patterns */
     font-family: 'Coda', cursive;
 }
 
@@ -31,6 +32,10 @@ body {
 h1 {
     font-family: 'Open Sans', sans-serif;
     font-weight: 300;
+}
+
+.hidden {
+    display: none !important;
 }
 
 /*
@@ -49,6 +54,8 @@ h1 {
     justify-content: space-between;
     align-items: center;
     margin: 0 0 3em;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .deck .card {
@@ -66,9 +73,12 @@ h1 {
 }
 
 .deck .card.open {
-    transform: rotateY(0);
     background: #02b3e4;
     cursor: default;
+    width: 125px;
+    transform: rotateY(0);
+    font-size: 33px;
+    animation: flip .5s ease;
 }
 
 .deck .card.show {
@@ -78,7 +88,17 @@ h1 {
 .deck .card.match {
     cursor: default;
     background: #02ccba;
+    animation: match 1.5s 1;
     font-size: 33px;
+}
+
+.deck .card.disable {
+    pointer-events: none;
+}
+
+.deck .card.close {
+    font-size: 33px;
+    animation: unflip .5s ease;
 }
 
 /*
@@ -89,6 +109,8 @@ h1 {
     text-align: left;
     width: 345px;
     margin-bottom: 10px;
+    display: flex;
+    justify-content: space-around;
 }
 
 .score-panel .stars {
@@ -101,9 +123,38 @@ h1 {
 .score-panel .stars li {
     list-style: none;
     display: inline-block;
+    color: #ffdd02;
 }
 
 .score-panel .restart {
     float: right;
     cursor: pointer;
+}
+
+@media screen and (max-width: 520px) {
+    .container {
+        font-size: 0.5em;
+    }
+    .deck {
+        width: 300px;
+        height: 300px;
+    }
+    .deck .card {
+        width: 5rem;
+        height: 5rem;
+    }
+}
+
+@media screen and (max-width: 660px) {
+    .container {
+        font-size: 0.75em;
+    }
+    .deck {
+        width: 540px;
+        height: 540px;
+    }
+    .deck .card {
+        width: 6rem;
+        height: 6rem;
+    }
 }

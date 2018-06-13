@@ -1,8 +1,40 @@
+/* global document, window */
+
 /*
  * Create a list that holds all of your cards
  */
+const cardsList = [
+  'fa fa-diamond',
+  'fa fa-diamond',
+  'fa fa-paper-plane-o',
+  'fa fa-paper-plane-o',
+  'fa fa-anchor',
+  'fa fa-anchor',
+  'fa fa-bolt',
+  'fa fa-bolt',
+  'fa fa-cube',
+  'fa fa-cube',
+  'fa fa-leaf',
+  'fa fa-leaf',
+  'fa fa-bicycle',
+  'fa fa-bicycle',
+  'fa fa-bomb',
+  'fa fa-bomb',
+];
 
+const star = '<li><i class="fa fa-star"></i></li>';
 
+const timerContainer = document.getElementById('timer');
+const cardsContainer = document.querySelector('.deck');
+const movesContainer = document.querySelector('.moves');
+const starsContainer = document.querySelector('.stars');
+const restartBtn = document.querySelector('.restart');
+const modal = document.getElementById('modal');
+const modalBody = document.querySelector('.modal-body');
+const modalPlayAgainBtn = document.getElementById('play-again-btn');
+
+let gameStats = null;
+let clock = null;
 /*
  * Display the cards on the page
  *   - shuffle the list of cards using the provided "shuffle" method below
@@ -12,17 +44,19 @@
 
 // Shuffle function from http://stackoverflow.com/a/2450976
 function shuffle(array) {
-    var currentIndex = array.length, temporaryValue, randomIndex;
+  let currentIndex = array.length;
+  let temporaryValue;
+  let randomIndex;
 
-    while (currentIndex !== 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex -= 1;
-        temporaryValue = array[currentIndex];
-        array[currentIndex] = array[randomIndex];
-        array[randomIndex] = temporaryValue;
-    }
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
 
-    return array;
+  return array;
 }
 
 
@@ -36,3 +70,216 @@ function shuffle(array) {
  *    + increment the move counter and display it on the page (put this functionality in another function that you call from this one)
  *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
  */
+
+
+function gameRating() {
+  if (gameStats.moves < 16) {
+    return star + star + star;
+  } else if (gameStats.moves < 24) {
+    return star + star;
+  }
+
+  return star;
+}
+
+function updateMoves() {
+  movesContainer.innerHTML = gameStats.moves;
+}
+
+
+function updateStars() {
+  gameStats.stars = gameRating();
+
+  starsContainer.innerHTML = gameStats.stars;
+}
+
+function updateScore() {
+  updateMoves();
+  updateStars();
+}
+
+
+/*
+ * Open Score Modal
+ */
+function openScoreModal() {
+  const timer = gameStats.timer;
+
+  modalBody.innerHTML = `
+    <p><b>Moves:</b> ${gameStats.moves}<br>
+      <b>Time taken:</b> ${timer.minutes} minutes, ${timer.seconds} seconds<br>
+      <b>Rating:</b> 
+    </p>
+    <span class="stars">${gameStats.stars}</span>`;
+
+  modal.style.display = 'block';
+}
+
+
+function isGameOver() {
+  if (gameStats.matchedCards.length === cardsList.length) {
+    openScoreModal();
+  }
+}
+
+
+function hideCards() {
+  for (let i = 0; i < gameStats.cardsFlipped.length; i += 1) {
+    const cardElem = gameStats.cardsFlipped[i];
+
+    cardElem.classList.remove('open', 'show', 'disable');
+  }
+
+  gameStats.cardsFlipped = [];
+}
+
+
+function compareCards(currentCard, previousCard) {
+  if (currentCard.type === previousCard.type) {
+    currentCard.classList.add('match');
+    previousCard.classList.add('match');
+
+    gameStats.matchedCards.push(currentCard, previousCard);
+
+    gameStats.cardsFlipped = [];
+
+    isGameOver();
+  } else {
+    setTimeout(hideCards, 100);
+  }
+}
+
+function clockTick() {
+  const timer = gameStats.timer;
+
+  timerContainer.innerHTML = `${timer.minutes} minutes, ${timer.seconds} seconds `;
+  timer.seconds += 1;
+  if (timer.seconds % 60 === 0) {
+    timer.minutes += 1;
+    timer.seconds = 0;
+  }
+}
+
+/**
+ *  Clear running clock
+ */
+function clearClock() {
+  clearTimeout(clock);
+  clock = null;
+  timerContainer.innerHTML = '';
+}
+
+
+/**
+ *  Clock to track  time
+ */
+function startClock() {
+  clockTick();
+  clock = setInterval(clockTick, 1000);
+}
+
+
+/**
+ *  Handle click action on cards
+ */
+function handleCardClick() {
+  const card = this;
+
+  // start clock if not running
+  if (!clock) {
+    startClock();
+  }
+
+  // ignore other clicks if there are two cards flipped
+  if (gameStats.cardsFlipped.length < 2) {
+    card.classList.add('open', 'show', 'disable');
+    gameStats.cardsFlipped.push(card);
+
+    // increment moves and update score panel
+    gameStats.moves += 1;
+    updateScore();
+
+    // compare both cards to check if matches
+    if (gameStats.cardsFlipped.length === 2) {
+      compareCards(card, gameStats.cardsFlipped[0]);
+    }
+  }
+}
+
+// Start the game
+function startGame() {
+  const cardsShuffled = shuffle(cardsList);
+
+  // init game stats
+  gameStats = {
+    cardsFlipped: [],
+    matchedCards: [],
+    moves: 0,
+    stars: star + star + star,
+    timer: {
+      minutes: 0,
+      seconds: 1,
+    },
+  };
+
+  // clear running clock
+  if (clock) {
+    clearClock();
+  }
+
+  // delete cards in cards container
+  cardsContainer.innerHTML = '';
+
+  // update score panel
+  updateScore();
+
+  // add cards to cards container
+  for (let i = 0, length = cardsShuffled.length; i < length; i++) {
+    const card = createCardElem(cardsShuffled[i]);
+
+    cardsContainer.appendChild(card);
+
+    card.addEventListener('click', handleCardClick);
+  }
+}
+
+
+/**
+ *  Helper function that creates a card element
+ */
+function createCardElem(cardType) {
+  const card = document.createElement('li');
+
+  card.setAttribute('type', cardType);
+  card.classList.add('card');
+  card.innerHTML = `<i class="${cardType}"></i>`;
+
+  return card;
+}
+
+/**
+ *  Helper function to register listeners
+ */
+function registerListeners() {
+  restartBtn.addEventListener('click', startGame);
+
+  modalPlayAgainBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+    startGame();
+  });
+
+  modal.addEventListener('click', () => {
+    modal.style.display = 'none';
+    startGame();
+  });
+}
+
+
+/**
+ *  Create a new game when it loads
+ */
+window.addEventListener('load', () => {
+  registerListeners();
+  startGame();
+});
+
