@@ -145,7 +145,7 @@ function compareCards(currentCard, previousCard) {
 
     isGameOver();
   } else {
-    setTimeout(hideCards, 100);
+    setTimeout(hideCards, 1000);
   }
 }
 
