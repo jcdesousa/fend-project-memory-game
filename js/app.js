@@ -72,6 +72,9 @@ function shuffle(array) {
  */
 
 
+ /**
+ *  Calculates stars based on the moves
+ */
 function gameRating() {
   if (gameStats.moves < 16) {
     return star + star + star;
@@ -82,17 +85,27 @@ function gameRating() {
   return star;
 }
 
+
+/**
+ *  Updates moves in score panel
+ */
 function updateMoves() {
   movesContainer.innerHTML = gameStats.moves;
 }
 
 
+/**
+ *  Updates stars in score panel
+ */
 function updateStars() {
   gameStats.stars = gameRating();
 
   starsContainer.innerHTML = gameStats.stars;
 }
 
+/**
+ *  Update score panel info
+ */
 function updateScore() {
   updateMoves();
   updateStars();
@@ -116,13 +129,18 @@ function openScoreModal() {
 }
 
 
+/**
+ *  Checks if game has ended
+ */
 function isGameOver() {
   if (gameStats.matchedCards.length === cardsList.length) {
     openScoreModal();
   }
 }
 
-
+/**
+ *  Hide flipped cards
+ */
 function hideCards() {
   for (let i = 0; i < gameStats.cardsFlipped.length; i += 1) {
     const cardElem = gameStats.cardsFlipped[i];
@@ -134,6 +152,9 @@ function hideCards() {
 }
 
 
+/**
+ *  Checks if two cards match
+ */
 function compareCards(currentCard, previousCard) {
   if (currentCard.type === previousCard.type) {
     currentCard.classList.add('match');
@@ -149,6 +170,10 @@ function compareCards(currentCard, previousCard) {
   }
 }
 
+
+/**
+ *  Clock function to update seconds and the time in the panel
+ */
 function clockTick() {
   const timer = gameStats.timer;
 
@@ -206,7 +231,9 @@ function handleCardClick() {
   }
 }
 
-// Start the game
+/**
+ *  Starts a new game
+ */
 function startGame() {
   const cardsShuffled = shuffle(cardsList);
 
@@ -263,15 +290,17 @@ function createCardElem(cardType) {
 function registerListeners() {
   restartBtn.addEventListener('click', startGame);
 
-  modalPlayAgainBtn.addEventListener('click', () => {
-    modal.style.display = 'none';
-    startGame();
-  });
+  modalPlayAgainBtn.addEventListener('click', handleModalClick);
 
-  modal.addEventListener('click', () => {
+  modal.addEventListener('click',handleModalClick);
+}
+
+/**
+ *  Helper function to handle modal click
+ */
+function handleModalClick() {
     modal.style.display = 'none';
     startGame();
-  });
 }
 
 
