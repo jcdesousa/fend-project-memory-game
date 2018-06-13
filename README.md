@@ -6,6 +6,7 @@ A complete browser-based card matching game (also known as Concentration). But t
 
 * [Instructions](#instructions)
 * [Install](#install)
+* [Dependencies](#dependencies)
 
 ## Instructions
 
@@ -24,5 +25,7 @@ The game ends once all cards have been correctly matched.
 
 Open the file `index.html` in any browser.
 
+## Dependencies
 
-
+* Google Fonts
+* Font Awesome
