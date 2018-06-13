@@ -134,6 +134,8 @@ function openScoreModal() {
  */
 function isGameOver() {
   if (gameStats.matchedCards.length === cardsList.length) {
+    clearTimeout(clock);
+
     openScoreModal();
   }
 }
@@ -177,12 +179,13 @@ function compareCards(currentCard, previousCard) {
 function clockTick() {
   const timer = gameStats.timer;
 
-  timerContainer.innerHTML = `${timer.minutes} minutes, ${timer.seconds} seconds `;
   timer.seconds += 1;
   if (timer.seconds % 60 === 0) {
     timer.minutes += 1;
     timer.seconds = 0;
   }
+  timerContainer.innerHTML = `${timer.minutes} minutes, ${timer.seconds} seconds `;
+
 }
 
 /**
@@ -191,7 +194,7 @@ function clockTick() {
 function clearClock() {
   clearTimeout(clock);
   clock = null;
-  timerContainer.innerHTML = '';
+  timerContainer.innerHTML = 'Timer not started';
 }
 
 
@@ -245,7 +248,7 @@ function startGame() {
     stars: star + star + star,
     timer: {
       minutes: 0,
-      seconds: 1,
+      seconds: 0,
     },
   };
 
